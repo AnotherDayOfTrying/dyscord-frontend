@@ -1,0 +1,87 @@
+name: AWS Deployment
+run-name: ${{github.actor}} is Deploying AWS Backend Infrastructure
+permissions: read-all
+on:
+    push:
+        branches:
+            - main
+jobs:
+    Build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: checkout
+              uses: actions/checkout@v4
+            - name: setup node
+              uses: actions/setup-node@v4
+              with:
+                node-version: 20
+            - name: node install
+              run: npm ci
+              working-directory: ./app
+            - name: node build
+              run: npm run build
+              working-directory: ./app
+            - name: cache site
+              uses: actions/cache@v4
+              with:
+                path: ./dist
+                key: cache-${{ github.sha }}
+
+    Synth:
+        runs-on: ubuntu-latest
+        needs: Build
+        steps:
+            - name: checkout
+              uses: actions/checkout@v4
+            - name: setup node
+              uses: actions/setup-node@v4
+              with:
+                node-version: 20
+            - name: node install
+              run: npm ci
+              working-directory: ./infrastructure
+            - name: load cache
+              uses: actions/cache@v4
+              with:
+                path: ./dist
+                key: cache-${{ github.sha }}
+            - name: install cdk
+              run: npm i -g aws-cdk
+            - name: run synth
+              run: cdk synth
+              env:
+                AWS_ACM: ${{ secrets.AWS_ACM }}
+                URL: ${{ vars.URL }}
+              working-directory: ./infrastructure
+    Deploy:
+        runs-on: ubuntu-latest
+        needs: Synth
+        steps:
+            - name: checkout
+              uses: actions/checkout@v4
+            - name: setup node
+              uses: actions/setup-node@v4
+              with:
+                node-version: 20
+            - name: load cache
+              uses: actions/cache@v4
+              with:
+                path: ./dist
+                key: cache-${{ github.sha }}
+            - name: node install
+              run: npm ci
+              working-directory: ./infrastructure
+            - name: install cdk
+              run: npm i -g aws-cdk
+            - name: setup aws cdk
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+                aws-region: 'us-east-2'
+            - name: deploy
+              run: cdk deploy --all --require-approval never
+              env:
+                AWS_ACM: ${{ secrets.AWS_ACM }}
+                URL: ${{ vars.URL }}
+              working-directory: ./infrastructure
