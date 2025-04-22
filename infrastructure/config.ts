@@ -1,4 +1,4 @@
 export default {
     url: process.env["URL"] || "",
-    acm: process.env["ACM"] || "",
+    acm: process.env["AWS_ACM"] || "",
 }
