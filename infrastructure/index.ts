@@ -1,6 +1,6 @@
 import {App, RemovalPolicy, Stack, type StackProps} from 'aws-cdk-lib';
 import type { Construct } from 'constructs';
-import s3, { BlockPublicAccess } from 'aws-cdk-lib/aws-s3'
+import s3 from 'aws-cdk-lib/aws-s3'
 import cloudfront from 'aws-cdk-lib/aws-cloudfront'
 import cloudfrontorigins from 'aws-cdk-lib/aws-cloudfront-origins'
 import certificatemanager from 'aws-cdk-lib/aws-certificatemanager'
@@ -88,4 +88,4 @@ export class FrontEndStack extends Stack {
 }
 
 const app = new App();
-new FrontEndStack(app, 'dyscord-frontend', {})
+new FrontEndStack(app, 'dyscord-frontend')
