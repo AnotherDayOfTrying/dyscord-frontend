@@ -65,6 +65,10 @@ button:focus-visible {
   text-align: center;
 }
 
+.backgroundbody {
+  /* background-image: url('./assets/image.png'); */
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

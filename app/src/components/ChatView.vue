@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import config from '../api/config'
 
 const router = useRouter()
 const exitChat = () => {
     router.replace('/')
 }
+
+window.addEventListener("beforeunload", config.dialog)
 </script>
 
 

@@ -1,27 +1,27 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import FirstView from './FirstView.vue';
+import config from '../api/config';
+import { createCall, setup, joinCall } from '../api/websocket';
+
+setup(config.websocketURL, config)
 
 const chatId = ref("")
 
-const router = useRouter();
-const joinChat = (chatId: string) => {
-    router.push("/" + chatId)
-}
+const viewed = document.cookie.includes("viewed")
+document.cookie = "viewed"
 
-const createChat = () => {
-    router.push("/" + "random_generated_string")
-}
+window.removeEventListener("beforeunload", config.dialog)
 </script>
 
 <template>
-    <h1>DYSFUNCTIONALCORD</h1>
-    <!-- Have this truncate to DYSCORD by taking left and right and SMASHING them together -->
+    <FirstView v-if="!viewed"/>
 
     <div class="container">
+        <h1>DYSCORD</h1>
         <input v-model="chatId"></input>
-        <button @click="joinChat(chatId)">Join</button>
-        <button @click="createChat()">Create</button>
+        <button @click="joinCall(chatId)">Join</button>
+        <button @click="createCall()">Create</button>
     </div>
 </template>
 
